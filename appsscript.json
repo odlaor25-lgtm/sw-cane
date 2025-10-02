@@ -1,0 +1,10 @@
+{
+  "timeZone": "Asia/Bangkok",
+  "dependencies": {},
+  "exceptionLogging": "STACKDRIVER",
+  "webapp": {
+    "access": "MYSELF",
+    "executeAs": "USER_ACCESSING"
+  },
+  "runtimeVersion": "V8"
+}

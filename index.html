@@ -1,0 +1,1843 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CANE MATRIX - Digital Price System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Orbitron', 'Courier New', monospace;
+            background: #000;
+            min-height: 100vh;
+            color: #00ff41;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Matrix Digital Rain Effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: #000;
+        }
+
+        .matrix-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+        }
+
+        /* Liquid Gas Effect */
+        .liquid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(0, 191, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
+            animation: liquidFlow 20s ease-in-out infinite;
+        }
+
+        @keyframes liquidFlow {
+            0%, 100% { 
+                background: radial-gradient(circle at 20% 50%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
+                            radial-gradient(circle at 80% 20%, rgba(0, 191, 255, 0.1) 0%, transparent 50%),
+                            radial-gradient(circle at 40% 80%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
+            }
+            25% { 
+                background: radial-gradient(circle at 60% 30%, rgba(0, 255, 65, 0.15) 0%, transparent 50%),
+                            radial-gradient(circle at 20% 70%, rgba(0, 191, 255, 0.15) 0%, transparent 50%),
+                            radial-gradient(circle at 80% 40%, rgba(138, 43, 226, 0.15) 0%, transparent 50%);
+            }
+            50% { 
+                background: radial-gradient(circle at 80% 80%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
+                            radial-gradient(circle at 40% 20%, rgba(0, 191, 255, 0.1) 0%, transparent 50%),
+                            radial-gradient(circle at 20% 60%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
+            }
+            75% { 
+                background: radial-gradient(circle at 30% 70%, rgba(0, 255, 65, 0.15) 0%, transparent 50%),
+                            radial-gradient(circle at 70% 50%, rgba(0, 191, 255, 0.15) 0%, transparent 50%),
+                            radial-gradient(circle at 50% 20%, rgba(138, 43, 226, 0.15) 0%, transparent 50%);
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-card {
+            background: rgba(0, 20, 40, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 255, 65, 0.2), inset 0 1px 0 rgba(0, 255, 65, 0.1);
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            animation: scanLine 3s infinite;
+        }
+
+        @keyframes scanLine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 255, 65, 0.3), inset 0 1px 0 rgba(0, 255, 65, 0.2);
+            border-color: rgba(0, 255, 65, 0.5);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .header h1 {
+            color: #00ff41;
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.8), 0 0 40px rgba(0, 255, 65, 0.4);
+            letter-spacing: 3px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(0, 255, 65, 0.8), 0 0 40px rgba(0, 255, 65, 0.4); }
+            to { text-shadow: 0 0 30px rgba(0, 255, 65, 1), 0 0 60px rgba(0, 255, 65, 0.6); }
+        }
+
+        .header p {
+            color: rgba(0, 255, 65, 0.8);
+            font-size: 1.1rem;
+            margin: 10px 0 0 0;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        /* Futuristic Navigation with Typewriter Effect */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            position: relative;
+        }
+
+        .nav-tab {
+            background: rgba(0, 20, 40, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 12px;
+            color: rgba(0, 255, 65, 0.7);
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 1px;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-tab:hover::before {
+            left: 100%;
+        }
+
+        .nav-tab:hover {
+            background: rgba(0, 255, 65, 0.1);
+            color: #00ff41;
+            border-color: rgba(0, 255, 65, 0.6);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            transform: translateY(-2px);
+            animation: navBounce 0.6s ease-out;
+        }
+
+        .nav-tab.active {
+            background: rgba(0, 255, 65, 0.2);
+            color: #00ff41;
+            border-color: rgba(0, 255, 65, 0.8);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.4), inset 0 0 20px rgba(0, 255, 65, 0.1);
+            animation: navActiveBounce 0.8s ease-out;
+        }
+
+        @keyframes navBounce {
+            0% { transform: translateY(-2px) scale(1); }
+            30% { transform: translateY(-8px) scale(1.05); }
+            50% { transform: translateY(-4px) scale(1.02); }
+            70% { transform: translateY(-6px) scale(1.03); }
+            100% { transform: translateY(-2px) scale(1); }
+        }
+
+        @keyframes navActiveBounce {
+            0% { transform: scale(1); }
+            20% { transform: scale(1.1) translateY(-3px); }
+            40% { transform: scale(0.95) translateY(-1px); }
+            60% { transform: scale(1.05) translateY(-2px); }
+            80% { transform: scale(0.98) translateY(-1px); }
+            100% { transform: scale(1) translateY(0); }
+        }
+
+        /* Typewriter Effect for Navigation */
+        .nav-tab-text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .nav-tab-text.typing {
+            border-right: 2px solid #00ff41;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { border-color: #00ff41; }
+            51%, 100% { border-color: transparent; }
+        }
+
+        .nav-tab-char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: charAppear 0.1s ease-out forwards;
+        }
+
+        @keyframes charAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Navigation Loading State */
+        .nav-tab.loading {
+            pointer-events: none;
+            background: rgba(0, 20, 40, 0.8);
+            animation: navPulse 1.5s infinite;
+        }
+
+        @keyframes navPulse {
+            0%, 100% { 
+                box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+                border-color: rgba(0, 255, 65, 0.3);
+            }
+            50% { 
+                box-shadow: 0 0 25px rgba(0, 255, 65, 0.6);
+                border-color: rgba(0, 255, 65, 0.6);
+            }
+        }
+
+        /* Page Transition Effect */
+        .page-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .page-transition.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .transition-text {
+            color: #00ff41;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            animation: digitalGlitch 0.5s infinite;
+        }
+
+        @keyframes digitalGlitch {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-2px); }
+            40% { transform: translateX(2px); }
+            60% { transform: translateX(-1px); }
+            80% { transform: translateX(1px); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: rgba(0, 20, 40, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff41, transparent);
+            animation: topScan 2s infinite;
+        }
+
+        @keyframes topScan {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .metric-card:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: scale(1.02);
+            border-color: rgba(0, 255, 65, 0.6);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+        }
+
+        .metric-title {
+            color: rgba(0, 255, 65, 0.9);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            color: #00ff41;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+            font-family: 'Orbitron', monospace;
+        }
+
+        .metric-note {
+            color: rgba(0, 255, 65, 0.7);
+            font-size: 0.8rem;
+        }
+
+        .controls-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: rgba(0, 20, 40, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 65, 0.4);
+            border-radius: 12px;
+            color: #00ff41;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: block;
+            width: 100%;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0, 255, 65, 0.3) 0%, transparent 70%);
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 255, 65, 0.3);
+            border-color: rgba(0, 255, 65, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+            color: #00ff41;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .data-table th {
+            background: rgba(0, 255, 65, 0.1);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .data-table td {
+            font-size: 0.95rem;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .status-online {
+            background: #00ff41;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+        }
+
+        .status-offline {
+            background: #ff0040;
+            box-shadow: 0 0 10px rgba(255, 0, 64, 0.8);
+        }
+
+        .news-section {
+            margin-top: 20px;
+        }
+
+        .news-item {
+            background: rgba(0, 20, 40, 0.6);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid rgba(0, 255, 65, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .news-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #00ff41, #00bfff);
+            animation: newsGlow 3s infinite;
+        }
+
+        @keyframes newsGlow {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .news-title {
+            color: #00ff41;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .news-content {
+            color: rgba(0, 255, 65, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            color: rgba(0, 255, 65, 0.7);
+            padding: 20px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 255, 65, 0.3);
+            border-radius: 50%;
+            border-top-color: #00ff41;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            color: rgba(0, 255, 65, 0.9);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 20, 40, 0.8);
+            color: #00ff41;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+            font-family: 'Orbitron', monospace;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(0, 255, 65, 0.5);
+        }
+
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: rgba(0, 255, 65, 0.8);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        .lang-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            min-width: auto;
+            width: auto;
+        }
+
+        .explanation-box {
+            background: rgba(0, 20, 40, 0.6);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 8px;
+            border-left: 3px solid rgba(0, 255, 65, 0.6);
+        }
+
+        .explanation-text {
+            color: rgba(0, 255, 65, 0.8);
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .page-content {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .news-sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .source-card {
+            background: rgba(0, 20, 40, 0.6);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .source-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ff41, #00bfff, #8a2be2, #00ff41);
+            border-radius: 16px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .source-card:hover::before {
+            opacity: 0.3;
+        }
+
+        .source-card:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 65, 0.3);
+        }
+
+        .source-logo {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .source-name {
+            color: #00ff41;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .source-desc {
+            color: rgba(0, 255, 65, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .source-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: rgba(0, 255, 65, 0.8);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-section {
+                grid-template-columns: 1fr;
+            }
+
+            .lang-toggle {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 10px auto;
+                display: block;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-tab {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .news-sources-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Matrix Background -->
+    <div class="matrix-bg">
+        <canvas class="matrix-canvas" id="matrixCanvas"></canvas>
+    </div>
+    
+    <!-- Liquid Gas Background -->
+    <div class="liquid-bg"></div>
+
+    <!-- Page Transition -->
+    <div class="page-transition" id="pageTransition">
+        <div class="transition-text" id="transitionText">LOADING MATRIX...</div>
+    </div>
+
+    <button class="btn lang-toggle" onclick="toggleLanguage()">
+        🌐 <span id="langToggle">ไทย/English</span>
+    </button>
+
+    <div class="container">
+        <div class="header">
+            <h1 id="headerTitle">CANE MATRIX SYSTEM</h1>
+            <p id="headerSubtitle">DIGITAL PRICE MONITORING • NEURAL NETWORK ANALYSIS</p>
+        </div>
+
+        <!-- Dashboard Metrics -->
+        <div class="dashboard-grid" id="dashboardMetrics">
+            <div class="metric-card">
+                <div class="metric-title" id="faoTitle">FAO SUGAR INDEX</div>
+                <div class="metric-value" id="faoValue">116.9</div>
+                <div class="metric-note" id="faoDate">LAST UPDATE: 2025-03-31</div>
+                <div class="explanation-box">
+                    <div class="explanation-text" id="faoExplain">
+                        Global sugar price indicator from FAO neural network. Higher values indicate expensive global sugar prices.
+                    </div>
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title" id="iceTitle">ICE NO.11 FUTURES</div>
+                <div class="metric-value" id="iceValue">22.45</div>
+                <div class="metric-note" id="iceUnit">CENTS/LB (30-DAY AVG)</div>
+                <div class="explanation-box">
+                    <div class="explanation-text" id="iceExplain">
+                        Raw sugar price in NY futures market. Key reference affecting Thai cane matrix calculations.
+                    </div>
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title" id="baseTitle">BASE CANE PRICE</div>
+                <div class="metric-value" id="basePrice">1,250</div>
+                <div class="metric-note" id="baseUnit">THB/TON</div>
+                <div class="explanation-box">
+                    <div class="explanation-text" id="baseExplain">
+                        Base cane price calculated by AI algorithm, excluding CCS compensation and bonuses.
+                    </div>
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title" id="bullTitle">MAXIMUM PROJECTION</div>
+                <div class="metric-value" id="bullPrice">1,450</div>
+                <div class="metric-note" id="bullUnit">THB/TON</div>
+                <div class="explanation-box">
+                    <div class="explanation-text" id="bullExplain">
+                        Maximum price projection if global sugar market surges, including all compensations.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showPage('dashboard')" id="tabDashboard">
+                <span class="nav-tab-text">📊 MATRIX CORE</span>
+            </button>
+            <button class="nav-tab" onclick="showPage('news')" id="tabNews">
+                <span class="nav-tab-text">📡 DATA STREAM</span>
+            </button>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="page-content">
+            <!-- Control Buttons -->
+            <div class="controls-section">
+                <button class="btn" onclick="fetchFAOData()">
+                    <span class="status-indicator status-online"></span>
+                    <span id="btnFAO">SYNC FAO NEURAL NET</span>
+                </button>
+                <button class="btn" onclick="fetchThaiNews()">
+                    <span class="status-indicator status-online"></span>
+                    <span id="btnNews">SCAN NEWS MATRIX</span>
+                </button>
+                <button class="btn" onclick="updateModel()">
+                    <span class="status-indicator status-online"></span>
+                    <span id="btnUpdate">UPDATE AI MODEL</span>
+                </button>
+                <button class="btn" onclick="exportData()">
+                    <span class="status-indicator status-online"></span>
+                    <span id="btnExport">EXPORT DATA STREAM</span>
+                </button>
+            </div>
+
+            <!-- Real-time Price Calculator -->
+            <div class="glass-card">
+                <h3 style="color: #00ff41; margin-top: 0;" id="calcTitle">🧮 QUANTUM PRICE CALCULATOR</h3>
+                <div class="controls-section">
+                    <div>
+                        <div class="input-group">
+                            <label id="calcFAOLabel">FAO NEURAL INDEX</label>
+                            <input type="number" id="calcFAO" placeholder="116.9" step="0.1" oninput="calculateLivePrice()">
+                        </div>
+                        <div class="input-group">
+                            <label id="calcICELabel">ICE FUTURES (CENTS/LB)</label>
+                            <input type="number" id="calcICE" placeholder="22.45" step="0.01" oninput="calculateLivePrice()">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="input-group">
+                            <label id="calcPolicyLabel">POLICY MATRIX (THB/TON)</label>
+                            <input type="number" id="calcPolicy" placeholder="150" step="1" oninput="calculateLivePrice()">
+                        </div>
+                        <div class="input-group">
+                            <label id="calcVolatilityLabel">VOLATILITY INDEX (%)</label>
+                            <input type="number" id="calcVolatility" placeholder="2.1" step="0.1" oninput="calculateLivePrice()">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="liveCalculation" class="dashboard-grid" style="margin-top: 20px;">
+                    <div class="metric-card">
+                        <div class="metric-title" id="liveBaseTitle">BASE CALC</div>
+                        <div class="metric-value" id="liveBase">-</div>
+                        <div class="metric-note" id="liveBaseUnit">THB/TON</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title" id="liveBullTitle">BULL SCENARIO</div>
+                        <div class="metric-value" id="liveBull">-</div>
+                        <div class="metric-note" id="liveBullUnit">THB/TON</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title" id="liveBearTitle">BEAR SCENARIO</div>
+                        <div class="metric-value" id="liveBear">-</div>
+                        <div class="metric-note" id="liveBearUnit">THB/TON</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-title" id="liveRangeTitle">PRICE RANGE</div>
+                        <div class="metric-value" id="liveRange">-</div>
+                        <div class="metric-note" id="liveRangeUnit">THB/TON</div>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="applyCalculation()" style="margin-top: 15px;" id="btnApply">
+                    ✅ APPLY QUANTUM CALC
+                </button>
+            </div>
+
+            <!-- Data Input Section -->
+            <div class="glass-card">
+                <h3 style="color: #00ff41; margin-top: 0;" id="inputTitle">📊 DATA INJECTION</h3>
+                <div class="controls-section">
+                    <div>
+                        <div class="input-group">
+                            <label id="inputDateLabel">DATE STAMP</label>
+                            <input type="date" id="inputDate" value="">
+                        </div>
+                        <div class="input-group">
+                            <label id="inputTypeLabel">DATA TYPE</label>
+                            <select id="dataType">
+                                <option value="fao" id="optionFAO">FAO NEURAL INDEX</option>
+                                <option value="ice" id="optionICE">ICE FUTURES</option>
+                                <option value="policy" id="optionPolicy">POLICY MATRIX</option>
+                                <option value="ocsb" id="optionOCSB">OCSB DATA STREAM</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="input-group">
+                            <label id="inputValueLabel">VALUE/PRICE</label>
+                            <input type="number" id="inputValue" placeholder="ENTER NUMERIC" step="0.01">
+                        </div>
+                        <div class="input-group">
+                            <label id="inputNoteLabel">METADATA</label>
+                            <input type="text" id="inputNote" placeholder="ADDITIONAL INFO">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn" onclick="addData()" style="margin-top: 10px;" id="btnAdd">
+                    ➕ INJECT DATA
+                </button>
+            </div>
+
+            <!-- Data Tables -->
+            <div class="glass-card">
+                <h3 style="color: #00ff41; margin-top: 0;" id="faoTableTitle">📈 FAO NEURAL NETWORK DATA</h3>
+                <table class="data-table" id="faoTable">
+                    <thead>
+                        <tr>
+                            <th id="thDate">DATE</th>
+                            <th id="thIndex">INDEX</th>
+                            <th id="thChange">DELTA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2025-03-31</td>
+                            <td>116.9</td>
+                            <td style="color: #00ff41;">+2.1%</td>
+                        </tr>
+                        <tr>
+                            <td>2025-02-28</td>
+                            <td>114.5</td>
+                            <td style="color: #ff0040;">-1.3%</td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-31</td>
+                            <td>116.0</td>
+                            <td style="color: #00ff41;">+0.8%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="glass-card">
+                <h3 style="color: #00ff41; margin-top: 0;" id="policyTableTitle">📋 POLICY MATRIX & PRICE DATA</h3>
+                <table class="data-table" id="policyTable">
+                    <thead>
+                        <tr>
+                            <th id="thPolicyDate">DATE</th>
+                            <th id="thPolicy">POLICY</th>
+                            <th id="thDetail">DETAILS</th>
+                            <th id="thValue">VALUE (THB/TON)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2025-01-15</td>
+                            <td>BASE PRICE</td>
+                            <td>Base cane price season 2024/25</td>
+                            <td>1,250</td>
+                        </tr>
+                        <tr>
+                            <td>2025-01-10</td>
+                            <td>CCS COMPENSATION</td>
+                            <td>Sweetness compensation 10 CCS+</td>
+                            <td>150</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- News Section -->
+            <div class="glass-card">
+                <h3 style="color: #00ff41; margin-top: 0;" id="newsTitle">📡 LATEST DATA STREAM</h3>
+                <div id="newsContainer">
+                    <div class="news-item">
+                        <div class="news-title" id="news1Title">BASE CANE PRICE 2024/25 SEASON: 1,250 THB/TON</div>
+                        <div class="news-content" id="news1Content">Cane and Sugar Committee neural network analysis confirms base cane price for 2024/25 season at 1,250 THB per ton with CCS sweetness compensation matrix...</div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-title" id="news2Title">FAO SUGAR INDEX MARCH: +2.1% INCREASE</div>
+                        <div class="news-content" id="news2Content">Food and Agriculture Organization neural network reports global sugar price index for March 2025 at 116.9 points, increased from previous month analysis...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- News Page -->
+        <div id="newsPage" class="page-content" style="display: none;">
+            <!-- News Sources -->
+            <div class="glass-card">
+                <h3 style="color: #00ff41; margin-top: 0;" id="newsSourcesTitle">🏢 DATA SOURCE MATRIX</h3>
+                <div class="news-sources-grid">
+                    <div class="source-card" onclick="loadOfficialNews('ocsb')">
+                        <div class="source-logo">🏛️</div>
+                        <div class="source-name" id="sourceOCSB">OCSB NEURAL NETWORK</div>
+                        <div class="source-desc" id="sourceOCSBDesc">Official cane price and policy data stream</div>
+                        <div class="source-status">
+                            <span class="status-indicator status-online"></span>
+                            <span id="statusOCSB">ONLINE</span>
+                        </div>
+                    </div>
+                    
+                    <div class="source-card" onclick="loadOfficialNews('sugar-assoc')">
+                        <div class="source-logo">🏭</div>
+                        <div class="source-name" id="sourceSugar">SUGAR MILLS MATRIX</div>
+                        <div class="source-desc" id="sourceSugarDesc">Cane purchase price data from mill network</div>
+                        <div class="source-status">
+                            <span class="status-indicator status-online"></span>
+                            <span id="statusSugar">ONLINE</span>
+                        </div>
+                    </div>
+                    
+                    <div class="source-card" onclick="loadOfficialNews('moac')">
+                        <div class="source-logo">🌾</div>
+                        <div class="source-name" id="sourceMOAC">AGRICULTURE MINISTRY AI</div>
+                        <div class="source-desc" id="sourceMOACDesc">Policy and farmer support neural analysis</div>
+                        <div class="source-status">
+                            <span class="status-indicator status-online"></span>
+                            <span id="statusMOAC">ONLINE</span>
+                        </div>
+                    </div>
+                    
+                    <div class="source-card" onclick="loadOfficialNews('farmer-assoc')">
+                        <div class="source-logo">👥</div>
+                        <div class="source-name" id="sourceFarmer">FARMER NETWORK HUB</div>
+                        <div class="source-desc" id="sourceFarmerDesc">News and information for farmer matrix</div>
+                        <div class="source-status">
+                            <span class="status-indicator status-online"></span>
+                            <span id="statusFarmer">ONLINE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Latest Official News -->
+            <div class="glass-card">
+                <div class="news-header">
+                    <h3 style="color: #00ff41; margin: 0;" id="officialNewsTitle">📢 OFFICIAL DATA STREAM</h3>
+                    <button class="btn refresh-btn" onclick="refreshAllNews()" id="btnRefresh">🔄 REFRESH MATRIX</button>
+                </div>
+                
+                <div id="officialNewsContainer">
+                    <div class="loading">
+                        <span class="spinner"></span>
+                        <span id="loadingText">SCANNING NEURAL NETWORKS...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'th';
+        
+        // Matrix Digital Rain Effect
+        function initMatrix() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
+            const matrixArray = matrix.split("");
+            
+            const fontSize = 10;
+            const columns = canvas.width / fontSize;
+            
+            const drops = [];
+            for(let x = 0; x < columns; x++) {
+                drops[x] = 1;
+            }
+            
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#00ff41';
+                ctx.font = fontSize + 'px monospace';
+                
+                for(let i = 0; i < drops.length; i++) {
+                    const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+            
+            setInterval(draw, 35);
+        }
+        
+        // Page Transition Effect
+        function showPageTransition(text, callback) {
+            const transition = document.getElementById('pageTransition');
+            const transitionText = document.getElementById('transitionText');
+            
+            transitionText.textContent = text;
+            transition.classList.add('active');
+            
+            setTimeout(() => {
+                if (callback) callback();
+                setTimeout(() => {
+                    transition.classList.remove('active');
+                }, 500);
+            }, 1000);
+        }
+        
+        // Typewriter Effect for Navigation
+        function typewriterEffect(element, text, speed = 80) {
+            return new Promise((resolve) => {
+                element.innerHTML = '';
+                element.classList.add('typing');
+                
+                let i = 0;
+                const timer = setInterval(() => {
+                    if (i < text.length) {
+                        const char = document.createElement('span');
+                        char.className = 'nav-tab-char';
+                        char.textContent = text[i];
+                        char.style.animationDelay = '0s';
+                        element.appendChild(char);
+                        i++;
+                    } else {
+                        clearInterval(timer);
+                        element.classList.remove('typing');
+                        resolve();
+                    }
+                }, speed);
+            });
+        }
+
+        // Enhanced Page Navigation with Typewriter
+        function showPage(pageId) {
+            const messages = {
+                'dashboard': currentLang === 'th' ? 'เข้าสู่ระบบแมทริกซ์หลัก...' : 'ACCESSING MAIN MATRIX...',
+                'news': currentLang === 'th' ? 'สแกนข้อมูลข่าวสาร...' : 'SCANNING DATA STREAM...'
+            };
+            
+            // Add loading state to clicked tab
+            const clickedTab = document.getElementById('tab' + pageId.charAt(0).toUpperCase() + pageId.slice(1));
+            clickedTab.classList.add('loading');
+            
+            showPageTransition(messages[pageId], () => {
+                // Hide all pages
+                document.getElementById('dashboardPage').style.display = 'none';
+                document.getElementById('newsPage').style.display = 'none';
+                
+                // Show selected page
+                document.getElementById(pageId + 'Page').style.display = 'block';
+                
+                // Update tab states
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.classList.remove('active', 'loading');
+                });
+                clickedTab.classList.add('active');
+                
+                // Trigger typewriter effect for active tab
+                const activeTabText = clickedTab.querySelector('.nav-tab-text');
+                const currentText = activeTabText.textContent;
+                typewriterEffect(activeTabText, currentText, 60);
+                
+                // Load news if switching to news page
+                if (pageId === 'news') {
+                    setTimeout(loadInitialNews, 500);
+                }
+            });
+        }
+
+        // Initialize Navigation Typewriter on Hover
+        function initNavTypewriter() {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                const textElement = tab.querySelector('.nav-tab-text');
+                const originalText = textElement.textContent;
+                
+                tab.addEventListener('mouseenter', () => {
+                    if (!tab.classList.contains('active') && !tab.classList.contains('loading')) {
+                        typewriterEffect(textElement, originalText, 50);
+                    }
+                });
+                
+                tab.addEventListener('mouseleave', () => {
+                    if (!tab.classList.contains('active')) {
+                        textElement.innerHTML = originalText;
+                        textElement.classList.remove('typing');
+                    }
+                });
+            });
+        }
+        
+        const translations = {
+            th: {
+                headerTitle: 'ระบบแมทริกซ์ราคาอ้อย',
+                headerSubtitle: 'ระบบติดตามราคาดิจิทัล • วิเคราะห์เครือข่ายประสาท',
+                tabDashboard: '📊 แกนแมทริกซ์',
+                tabNews: '📡 สตรีมข้อมูล',
+                faoTitle: 'ดัชนีน้ำตาล FAO',
+                faoDate: 'อัพเดทล่าสุด: 2025-03-31',
+                faoExplain: 'ตัวชี้วัดราคาน้ำตาลโลกจากเครือข่ายประสาท FAO ค่าสูงแสดงราคาน้ำตาลโลกแพง',
+                iceTitle: 'ฟิวเจอร์ส ICE NO.11',
+                iceUnit: 'เซนต์/ปอนด์ (เฉลี่ย 30 วัน)',
+                iceExplain: 'ราคาน้ำตาลดิบในตลาดล่วงหน้านิวยอร์ก อ้างอิงสำคัญในการคำนวณแมทริกซ์อ้อยไทย',
+                baseTitle: 'ราคาอ้อยขั้นต้น',
+                baseUnit: 'บาท/ตัน',
+                baseExplain: 'ราคาอ้อยขั้นต้นที่คำนวณด้วยอัลกอริทึม AI ยังไม่รวมค่าชดเชย CCS และโบนัส',
+                bullTitle: 'การคาดการณ์สูงสุด',
+                bullUnit: 'บาท/ตัน',
+                bullExplain: 'การคาดการณ์ราคาสูงสุดหากตลาดน้ำตาลโลกพุ่งสูง รวมค่าชดเชยทั้งหมด',
+                btnFAO: 'ซิงค์เครือข่าย FAO',
+                btnNews: 'สแกนแมทริกซ์ข่าว',
+                btnUpdate: 'อัพเดท AI โมเดล',
+                btnExport: 'ส่งออกสตรีมข้อมูล',
+                calcTitle: '🧮 เครื่องคำนวณควอนตัม',
+                calcFAOLabel: 'ดัชนีเครือข่าย FAO',
+                calcICELabel: 'ฟิวเจอร์ส ICE (เซนต์/ปอนด์)',
+                calcPolicyLabel: 'แมทริกซ์นโยบาย (บาท/ตัน)',
+                calcVolatilityLabel: 'ดัชนีความผันผวน (%)',
+                liveBaseTitle: 'การคำนวณขั้นต้น',
+                liveBullTitle: 'สถานการณ์ Bull',
+                liveBearTitle: 'สถานการณ์ Bear',
+                liveRangeTitle: 'ช่วงราคา',
+                btnApply: '✅ ใช้การคำนวณควอนตัม',
+                inputTitle: '📊 การฉีดข้อมูล',
+                inputDateLabel: 'ตราวันที่',
+                inputTypeLabel: 'ประเภทข้อมูล',
+                inputValueLabel: 'ค่า/ราคา',
+                inputNoteLabel: 'เมตาดาต้า',
+                btnAdd: '➕ ฉีดข้อมูล',
+                faoTableTitle: '📈 ข้อมูลเครือข่ายประสาท FAO',
+                policyTableTitle: '📋 แมทริกซ์นโยบายและข้อมูลราคา',
+                newsTitle: '📡 สตรีมข้อมูลล่าสุด',
+                thDate: 'วันที่',
+                thIndex: 'ดัชนี',
+                thChange: 'เดลต้า',
+                thPolicyDate: 'วันที่',
+                thPolicy: 'นโยบาย',
+                thDetail: 'รายละเอียด',
+                thValue: 'ค่า (บาท/ตัน)',
+                optionFAO: 'ดัชนีเครือข่าย FAO',
+                optionICE: 'ฟิวเจอร์ส ICE',
+                optionPolicy: 'แมทริกซ์นโยบาย',
+                optionOCSB: 'สตรีมข้อมูล OCSB',
+                news1Title: 'ราคาอ้อยขั้นต้นฤดูกาล 2024/25: 1,250 บาท/ตัน',
+                news1Content: 'การวิเคราะห์เครือข่ายประสาทของคณะกรรมการอ้อยและน้ำตาลทรายยืนยันราคาอ้อยขั้นต้นสำหรับฤดูกาล 2024/25 ที่ 1,250 บาทต่อตัน พร้อมแมทริกซ์ค่าชดเชยความหวาน CCS...',
+                news2Title: 'ดัชนีน้ำตาล FAO เดือนมีนาคม: เพิ่มขึ้น +2.1%',
+                news2Content: 'เครือข่ายประสาทขององค์การอาหารและเกษตรรายงานดัชนีราคาน้ำตาลโลกสำหรับเดือนมีนาคม 2025 ที่ 116.9 จุด เพิ่มขึ้นจากการวิเคราะห์เดือนก่อน...',
+                newsSourcesTitle: '🏢 แมทริกซ์แหล่งข้อมูล',
+                sourceOCSB: 'เครือข่ายประสาท OCSB',
+                sourceOCSBDesc: 'สตรีมข้อมูลราคาอ้อยและนโยบายอย่างเป็นทางการ',
+                sourceSugar: 'แมทริกซ์โรงงานน้ำตาล',
+                sourceSugarDesc: 'ข้อมูลราคารับซื้ออ้อยจากเครือข่ายโรงงาน',
+                sourceMOAC: 'AI กระทรวงเกษตร',
+                sourceMOACDesc: 'การวิเคราะห์เครือข่ายประสาทนโยบายและสนับสนุนเกษตรกร',
+                sourceFarmer: 'ฮับเครือข่ายเกษตรกร',
+                sourceFarmerDesc: 'ข่าวสารและข้อมูลสำหรับแมทริกซ์เกษตรกร',
+                statusOCSB: 'ออนไลน์',
+                statusSugar: 'ออนไลน์',
+                statusMOAC: 'ออนไลน์',
+                statusFarmer: 'ออนไลน์',
+                officialNewsTitle: '📢 สตรีมข้อมูลอย่างเป็นทางการ',
+                btnRefresh: '🔄 รีเฟรชแมทริกซ์',
+                loadingText: 'กำลังสแกนเครือข่ายประสาท...'
+            },
+            en: {
+                headerTitle: 'CANE MATRIX SYSTEM',
+                headerSubtitle: 'DIGITAL PRICE MONITORING • NEURAL NETWORK ANALYSIS',
+                tabDashboard: '📊 MATRIX CORE',
+                tabNews: '📡 DATA STREAM',
+                faoTitle: 'FAO SUGAR INDEX',
+                faoDate: 'LAST UPDATE: 2025-03-31',
+                faoExplain: 'Global sugar price indicator from FAO neural network. Higher values indicate expensive global sugar prices.',
+                iceTitle: 'ICE NO.11 FUTURES',
+                iceUnit: 'CENTS/LB (30-DAY AVG)',
+                iceExplain: 'Raw sugar price in NY futures market. Key reference affecting Thai cane matrix calculations.',
+                baseTitle: 'BASE CANE PRICE',
+                baseUnit: 'THB/TON',
+                baseExplain: 'Base cane price calculated by AI algorithm, excluding CCS compensation and bonuses.',
+                bullTitle: 'MAXIMUM PROJECTION',
+                bullUnit: 'THB/TON',
+                bullExplain: 'Maximum price projection if global sugar market surges, including all compensations.',
+                btnFAO: 'SYNC FAO NEURAL NET',
+                btnNews: 'SCAN NEWS MATRIX',
+                btnUpdate: 'UPDATE AI MODEL',
+                btnExport: 'EXPORT DATA STREAM',
+                calcTitle: '🧮 QUANTUM PRICE CALCULATOR',
+                calcFAOLabel: 'FAO NEURAL INDEX',
+                calcICELabel: 'ICE FUTURES (CENTS/LB)',
+                calcPolicyLabel: 'POLICY MATRIX (THB/TON)',
+                calcVolatilityLabel: 'VOLATILITY INDEX (%)',
+                liveBaseTitle: 'BASE CALC',
+                liveBullTitle: 'BULL SCENARIO',
+                liveBearTitle: 'BEAR SCENARIO',
+                liveRangeTitle: 'PRICE RANGE',
+                btnApply: '✅ APPLY QUANTUM CALC',
+                inputTitle: '📊 DATA INJECTION',
+                inputDateLabel: 'DATE STAMP',
+                inputTypeLabel: 'DATA TYPE',
+                inputValueLabel: 'VALUE/PRICE',
+                inputNoteLabel: 'METADATA',
+                btnAdd: '➕ INJECT DATA',
+                faoTableTitle: '📈 FAO NEURAL NETWORK DATA',
+                policyTableTitle: '📋 POLICY MATRIX & PRICE DATA',
+                newsTitle: '📡 LATEST DATA STREAM',
+                thDate: 'DATE',
+                thIndex: 'INDEX',
+                thChange: 'DELTA',
+                thPolicyDate: 'DATE',
+                thPolicy: 'POLICY',
+                thDetail: 'DETAILS',
+                thValue: 'VALUE (THB/TON)',
+                optionFAO: 'FAO NEURAL INDEX',
+                optionICE: 'ICE FUTURES',
+                optionPolicy: 'POLICY MATRIX',
+                optionOCSB: 'OCSB DATA STREAM',
+                news1Title: 'BASE CANE PRICE 2024/25 SEASON: 1,250 THB/TON',
+                news1Content: 'Cane and Sugar Committee neural network analysis confirms base cane price for 2024/25 season at 1,250 THB per ton with CCS sweetness compensation matrix...',
+                news2Title: 'FAO SUGAR INDEX MARCH: +2.1% INCREASE',
+                news2Content: 'Food and Agriculture Organization neural network reports global sugar price index for March 2025 at 116.9 points, increased from previous month analysis...',
+                newsSourcesTitle: '🏢 DATA SOURCE MATRIX',
+                sourceOCSB: 'OCSB NEURAL NETWORK',
+                sourceOCSBDesc: 'Official cane price and policy data stream',
+                sourceSugar: 'SUGAR MILLS MATRIX',
+                sourceSugarDesc: 'Cane purchase price data from mill network',
+                sourceMOAC: 'AGRICULTURE MINISTRY AI',
+                sourceMOACDesc: 'Policy and farmer support neural analysis',
+                sourceFarmer: 'FARMER NETWORK HUB',
+                sourceFarmerDesc: 'News and information for farmer matrix',
+                statusOCSB: 'ONLINE',
+                statusSugar: 'ONLINE',
+                statusMOAC: 'ONLINE',
+                statusFarmer: 'ONLINE',
+                officialNewsTitle: '📢 OFFICIAL DATA STREAM',
+                btnRefresh: '🔄 REFRESH MATRIX',
+                loadingText: 'SCANNING NEURAL NETWORKS...'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'th' ? 'en' : 'th';
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const t = translations[currentLang];
+            
+            // Update all text elements
+            Object.keys(t).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    // Special handling for navigation tabs
+                    if (key === 'tabDashboard' || key === 'tabNews') {
+                        const textElement = element.querySelector('.nav-tab-text');
+                        if (textElement) {
+                            textElement.textContent = t[key];
+                        }
+                    } else {
+                        element.textContent = t[key];
+                    }
+                }
+            });
+
+            // Update language toggle button
+            document.getElementById('langToggle').textContent = currentLang === 'th' ? 'English' : 'ไทย';
+            
+            // Re-trigger typewriter for active tab after language change
+            const activeTab = document.querySelector('.nav-tab.active');
+            if (activeTab) {
+                const activeTabText = activeTab.querySelector('.nav-tab-text');
+                const currentText = activeTabText.textContent;
+                setTimeout(() => typewriterEffect(activeTabText, currentText, 60), 300);
+            }
+        }
+
+        // Sample data storage
+        let dashboardData = {
+            fao: [
+                { date: '2025-03-31', value: 116.9, change: 2.1 },
+                { date: '2025-02-28', value: 114.5, change: -1.3 },
+                { date: '2025-01-31', value: 116.0, change: 0.8 }
+            ],
+            policy: [
+                { date: '2025-01-15', policy: 'BASE PRICE', detail: 'Base cane price season 2024/25', value: 1250 },
+                { date: '2025-01-10', policy: 'CCS COMPENSATION', detail: 'Sweetness compensation 10 CCS+', value: 150 }
+            ],
+            model: {
+                faoLast: 116.9,
+                ice30dAvg: 22.45,
+                policySupport: 150,
+                basePrice: 1250,
+                bullPrice: 1450,
+                bearPrice: 1050
+            }
+        };
+
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                const loadingText = currentLang === 'th' ? 'กำลังสแกนเครือข่าย...' : 'SCANNING NETWORKS...';
+                element.innerHTML = `<div class="loading"><span class="spinner"></span>${loadingText}</div>`;
+            }
+        }
+
+        function fetchFAOData() {
+            showPageTransition(currentLang === 'th' ? 'ซิงค์ข้อมูล FAO...' : 'SYNCING FAO DATA...', () => {
+                showLoading('newsContainer');
+                
+                // Simulate API call
+                setTimeout(() => {
+                    const newData = {
+                        date: new Date().toISOString().split('T')[0],
+                        value: 118.2 + (Math.random() - 0.5) * 4,
+                        change: (Math.random() - 0.5) * 6
+                    };
+                    
+                    dashboardData.fao.unshift(newData);
+                    if (dashboardData.fao.length > 10) dashboardData.fao.pop();
+                    
+                    updateFAOTable();
+                    updateMetrics();
+                    
+                    const successTitle = currentLang === 'th' ? '✅ ซิงค์ข้อมูล FAO สำเร็จ' : '✅ FAO DATA SYNC COMPLETE';
+                    const successContent = currentLang === 'th' ? 
+                        `อัพเดทดัชนีน้ำตาล FAO: ${newData.value.toFixed(1)} (${newData.change > 0 ? '+' : ''}${newData.change.toFixed(1)}%)` :
+                        `Updated FAO Sugar Index: ${newData.value.toFixed(1)} (${newData.change > 0 ? '+' : ''}${newData.change.toFixed(1)}%)`;
+                    
+                    document.getElementById('newsContainer').innerHTML = `
+                        <div class="news-item">
+                            <div class="news-title">${successTitle}</div>
+                            <div class="news-content">${successContent}</div>
+                        </div>
+                    `;
+                }, 2000);
+            });
+        }
+
+        function fetchThaiNews() {
+            showPageTransition(currentLang === 'th' ? 'สแกนแมทริกซ์ข่าว...' : 'SCANNING NEWS MATRIX...', () => {
+                showLoading('newsContainer');
+                
+                const sampleNews = currentLang === 'th' ? [
+                    {
+                        title: 'ราคาอ้อยปรับขึ้น 50 บาท/ตัน หลังน้ำตาลโลกพุ่ง',
+                        content: 'เครือข่ายโรงงานน้ำตาลไทยประกาศปรับราคารับซื้ออ้อยเพิ่มขึ้น 50 บาทต่อตัน เนื่องจากราคาน้ำตาลในตลาดโลกปรับตัวสูงขึ้นต่อเนื่อง...'
+                    },
+                    {
+                        title: 'เกษตรกรอ้อยได้รับค่าชดเชยเพิ่ม 75 บาท/ตัน',
+                        content: 'AI กระทรวงเกษตรและสหกรณ์อนุมัติจ่ายค่าชดเชยให้เกษตรกรอ้อยเพิ่มเติม 75 บาทต่อตัน จากการที่ราคาน้ำตาลดิบสูงกว่าเป้าหมาย...'
+                    }
+                ] : [
+                    {
+                        title: 'Cane Price Increased 50 THB/ton Following Global Sugar Rally',
+                        content: 'Thai Sugar Mills Matrix announced cane purchase price increase of 50 THB per ton due to continued rise in global sugar market prices...'
+                    },
+                    {
+                        title: 'Farmers Receive Additional 75 THB/ton Compensation',
+                        content: 'Agriculture Ministry AI approved additional compensation of 75 THB per ton for cane farmers as raw sugar prices exceeded targets...'
+                    }
+                ];
+                
+                setTimeout(() => {
+                    const randomNews = sampleNews[Math.floor(Math.random() * sampleNews.length)];
+                    document.getElementById('newsContainer').innerHTML = `
+                        <div class="news-item">
+                            <div class="news-title">${randomNews.title}</div>
+                            <div class="news-content">${randomNews.content}</div>
+                        </div>
+                    `;
+                }, 1500);
+            });
+        }
+
+        function updateModel() {
+            showPageTransition(currentLang === 'th' ? 'อัพเดท AI โมเดล...' : 'UPDATING AI MODEL...', () => {
+                showLoading('newsContainer');
+                
+                setTimeout(() => {
+                    const calculation = calculateRealTimePrice();
+                    
+                    dashboardData.model.basePrice = calculation.base;
+                    dashboardData.model.bullPrice = calculation.bull;
+                    dashboardData.model.bearPrice = calculation.bear;
+                    
+                    updateMetrics();
+                    
+                    const title = currentLang === 'th' ? '🔄 อัพเดท AI โมเดลสำเร็จ' : '🔄 AI MODEL UPDATE COMPLETE';
+                    const content = currentLang === 'th' ? 
+                        `<strong>การคาดการณ์ราคา:</strong><br>• Base: ${calculation.base.toLocaleString()} บาท/ตัน<br>• Bull: ${calculation.bull.toLocaleString()} บาท/ตัน<br>• Bear: ${calculation.bear.toLocaleString()} บาท/ตัน` :
+                        `<strong>Price Projections:</strong><br>• Base: ${calculation.base.toLocaleString()} THB/ton<br>• Bull: ${calculation.bull.toLocaleString()} THB/ton<br>• Bear: ${calculation.bear.toLocaleString()} THB/ton`;
+                    
+                    document.getElementById('newsContainer').innerHTML = `
+                        <div class="news-item">
+                            <div class="news-title">${title}</div>
+                            <div class="news-content">${content}</div>
+                        </div>
+                    `;
+                }, 1000);
+            });
+        }
+
+        function exportData() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                dashboard: dashboardData
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cane-matrix-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            const title = currentLang === 'th' ? '💾 ส่งออกข้อมูลสำเร็จ' : '💾 DATA EXPORT COMPLETE';
+            const content = currentLang === 'th' ? 
+                `ไฟล์ข้อมูลถูกดาวน์โหลดแล้ว: cane-matrix-${new Date().toISOString().split('T')[0]}.json` :
+                `Data file downloaded: cane-matrix-${new Date().toISOString().split('T')[0]}.json`;
+            
+            document.getElementById('newsContainer').innerHTML = `
+                <div class="news-item">
+                    <div class="news-title">${title}</div>
+                    <div class="news-content">${content}</div>
+                </div>
+            `;
+        }
+
+        function calculateRealTimePrice() {
+            const faoLatest = dashboardData.fao[0].value;
+            const icePrice = dashboardData.model.ice30dAvg;
+            const policySupport = dashboardData.model.policySupport;
+            
+            // AI price calculation formula
+            const faoFactor = (faoLatest - 100) * 15;
+            const iceFactor = (icePrice - 20) * 25;
+            const baseCalculated = 1000 + faoFactor + iceFactor + policySupport;
+            
+            // Calculate Bull/Bear scenarios
+            const volatility = Math.abs(dashboardData.fao[0].change || 0) * 10;
+            const bullMultiplier = 1 + (volatility / 100) + 0.15;
+            const bearMultiplier = 1 - (volatility / 100) - 0.12;
+            
+            return {
+                base: Math.max(800, Math.round(baseCalculated)),
+                bull: Math.round(baseCalculated * bullMultiplier),
+                bear: Math.round(baseCalculated * bearMultiplier)
+            };
+        }
+
+        function calculateLivePrice() {
+            const fao = parseFloat(document.getElementById('calcFAO').value) || 0;
+            const ice = parseFloat(document.getElementById('calcICE').value) || 0;
+            const policy = parseFloat(document.getElementById('calcPolicy').value) || 0;
+            const volatility = parseFloat(document.getElementById('calcVolatility').value) || 0;
+            
+            if (fao === 0 && ice === 0) {
+                document.getElementById('liveBase').textContent = '-';
+                document.getElementById('liveBull').textContent = '-';
+                document.getElementById('liveBear').textContent = '-';
+                document.getElementById('liveRange').textContent = '-';
+                return;
+            }
+            
+            // Quantum price calculation
+            const faoFactor = (fao - 100) * 15;
+            const iceFactor = (ice - 20) * 25;
+            const baseCalculated = 1000 + faoFactor + iceFactor + policy;
+            
+            const basePrice = Math.max(800, Math.round(baseCalculated));
+            const bullMultiplier = 1 + (volatility / 100) + 0.15;
+            const bearMultiplier = 1 - (volatility / 100) - 0.12;
+            
+            const bullPrice = Math.round(baseCalculated * bullMultiplier);
+            const bearPrice = Math.round(baseCalculated * bearMultiplier);
+            const priceRange = bullPrice - bearPrice;
+            
+            // Update display with glow effect
+            document.getElementById('liveBase').textContent = basePrice.toLocaleString();
+            document.getElementById('liveBull').textContent = bullPrice.toLocaleString();
+            document.getElementById('liveBear').textContent = bearPrice.toLocaleString();
+            document.getElementById('liveRange').textContent = priceRange.toLocaleString();
+        }
+
+        function applyCalculation() {
+            const fao = parseFloat(document.getElementById('calcFAO').value);
+            const ice = parseFloat(document.getElementById('calcICE').value);
+            const policy = parseFloat(document.getElementById('calcPolicy').value);
+            const volatility = parseFloat(document.getElementById('calcVolatility').value);
+            
+            if (!fao || !ice) {
+                const alertMsg = currentLang === 'th' ? 'กรุณากรอกค่า FAO และ ICE' : 'Please enter FAO and ICE values';
+                alert(alertMsg);
+                return;
+            }
+            
+            showPageTransition(currentLang === 'th' ? 'ประมวลผลควอนตัม...' : 'PROCESSING QUANTUM CALC...', () => {
+                // Update main data
+                dashboardData.model.faoLast = fao;
+                dashboardData.model.ice30dAvg = ice;
+                dashboardData.model.policySupport = policy || 0;
+                
+                // Calculate and update prices
+                const faoFactor = (fao - 100) * 15;
+                const iceFactor = (ice - 20) * 25;
+                const baseCalculated = 1000 + faoFactor + iceFactor + (policy || 0);
+                
+                const basePrice = Math.max(800, Math.round(baseCalculated));
+                const bullMultiplier = 1 + (volatility / 100) + 0.15;
+                const bearMultiplier = 1 - (volatility / 100) - 0.12;
+                
+                dashboardData.model.basePrice = basePrice;
+                dashboardData.model.bullPrice = Math.round(baseCalculated * bullMultiplier);
+                dashboardData.model.bearPrice = Math.round(baseCalculated * bearMultiplier);
+                
+                // Update main display
+                updateMetrics();
+                
+                // Show results
+                const title = currentLang === 'th' ? '✅ ประมวลผลควอนตัมสำเร็จ' : '✅ QUANTUM PROCESSING COMPLETE';
+                const content = currentLang === 'th' ? 
+                    `<strong>ราคาใหม่:</strong> Base ${basePrice.toLocaleString()} บาท/ตัน<br><strong>ปัจจัยที่ใช้:</strong> FAO ${fao}, ICE ${ice}, Policy ${policy || 0}, Volatility ${volatility || 0}%` :
+                    `<strong>New Price:</strong> Base ${basePrice.toLocaleString()} THB/ton<br><strong>Factors Used:</strong> FAO ${fao}, ICE ${ice}, Policy ${policy || 0}, Volatility ${volatility || 0}%`;
+                
+                document.getElementById('newsContainer').innerHTML = `
+                    <div class="news-item">
+                        <div class="news-title">${title}</div>
+                        <div class="news-content">${content}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function addData() {
+            const date = document.getElementById('inputDate').value;
+            const type = document.getElementById('dataType').value;
+            const value = parseFloat(document.getElementById('inputValue').value);
+            const note = document.getElementById('inputNote').value;
+            
+            if (!date || isNaN(value)) {
+                const alertMsg = currentLang === 'th' ? 'กรุณากรอกวันที่และค่าที่ถูกต้อง' : 'Please enter valid date and value';
+                alert(alertMsg);
+                return;
+            }
+            
+            showPageTransition(currentLang === 'th' ? 'ฉีดข้อมูลเข้าแมทริกซ์...' : 'INJECTING DATA TO MATRIX...', () => {
+                if (type === 'fao') {
+                    dashboardData.fao.unshift({
+                        date: date,
+                        value: value,
+                        change: 0
+                    });
+                    updateFAOTable();
+                } else if (type === 'policy') {
+                    dashboardData.policy.unshift({
+                        date: date,
+                        policy: currentLang === 'th' ? 'ข้อมูลใหม่' : 'NEW DATA',
+                        detail: note || (currentLang === 'th' ? 'ไม่มีรายละเอียด' : 'No details'),
+                        value: value
+                    });
+                    updatePolicyTable();
+                }
+                
+                // Clear inputs
+                document.getElementById('inputValue').value = '';
+                document.getElementById('inputNote').value = '';
+                
+                const title = currentLang === 'th' ? '✅ ฉีดข้อมูลสำเร็จ' : '✅ DATA INJECTION COMPLETE';
+                const content = currentLang === 'th' ? 
+                    `เพิ่มข้อมูล ${type.toUpperCase()} วันที่ ${date} ค่า ${value} เข้าแมทริกซ์แล้ว` :
+                    `Added ${type.toUpperCase()} data for ${date} value ${value} to matrix`;
+                
+                document.getElementById('newsContainer').innerHTML = `
+                    <div class="news-item">
+                        <div class="news-title">${title}</div>
+                        <div class="news-content">${content}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateFAOTable() {
+            const tbody = document.querySelector('#faoTable tbody');
+            tbody.innerHTML = dashboardData.fao.slice(0, 5).map(item => `
+                <tr>
+                    <td>${item.date}</td>
+                    <td>${item.value.toFixed(1)}</td>
+                    <td style="color: ${item.change >= 0 ? '#00ff41' : '#ff0040'};">
+                        ${item.change >= 0 ? '+' : ''}${item.change.toFixed(1)}%
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updatePolicyTable() {
+            const tbody = document.querySelector('#policyTable tbody');
+            tbody.innerHTML = dashboardData.policy.slice(0, 5).map(item => `
+                <tr>
+                    <td>${item.date}</td>
+                    <td>${item.policy}</td>
+                    <td>${item.detail}</td>
+                    <td>${item.value.toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateMetrics() {
+            document.getElementById('faoValue').textContent = dashboardData.model.faoLast.toFixed(1);
+            document.getElementById('iceValue').textContent = dashboardData.model.ice30dAvg.toFixed(2);
+            document.getElementById('basePrice').textContent = dashboardData.model.basePrice.toLocaleString();
+            document.getElementById('bullPrice').textContent = dashboardData.model.bullPrice.toLocaleString();
+        }
+
+        function loadOfficialNews(source) {
+            showLoading('officialNewsContainer');
+            
+            const newsData = {
+                'ocsb': [
+                    {
+                        title: currentLang === 'th' ? 'ประกาศราคาอ้อยขั้นต้นฤดูกาล 2024/25' : 'BASE CANE PRICE ANNOUNCEMENT 2024/25',
+                        content: currentLang === 'th' ? 
+                            'เครือข่ายประสาทคณะกรรมการอ้อยและน้ำตาลทรายมีมติกำหนดราคาอ้อยขั้นต้นสำหรับฤดูกาล 2024/25 ที่ระดับ 1,250 บาทต่อตัน พร้อมแมทริกซ์ค่าชดเชยความหวาน CCS' :
+                            'Cane and Sugar Committee neural network set base cane price for 2024/25 season at 1,250 THB per ton with CCS sweetness compensation matrix',
+                        source: currentLang === 'th' ? 'เครือข่าย OCSB' : 'OCSB Network',
+                        time: currentLang === 'th' ? '2 ชั่วโมงที่แล้ว' : '2 hours ago'
+                    }
+                ],
+                'sugar-assoc': [
+                    {
+                        title: currentLang === 'th' ? 'แมทริกซ์โรงงานน้ำตาลปรับราคารับซื้ออ้อยเพิ่มขึ้น' : 'SUGAR MILLS MATRIX INCREASE CANE PURCHASE PRICE',
+                        content: currentLang === 'th' ? 
+                            'แมทริกซ์โรงงานน้ำตาลไทยประกาศปรับราคารับซื้ออ้อยเพิ่มขึ้น 50 บาทต่อตัน เนื่องจากราคาน้ำตาลโลกแข็งแกร่ง' :
+                            'Thai Sugar Mills Matrix announced 50 THB per ton increase in cane purchase price due to strong global sugar prices',
+                        source: currentLang === 'th' ? 'แมทริกซ์โรงงานน้ำตาล' : 'Sugar Mills Matrix',
+                        time: currentLang === 'th' ? '1 วันที่แล้ว' : '1 day ago'
+                    }
+                ]
+            };
+            
+            setTimeout(() => {
+                const news = newsData[source] || [];
+                const newsHtml = news.map(item => `
+                    <div class="news-item">
+                        <div class="news-title">${item.title}</div>
+                        <div class="announcement-meta">${item.source} • ${item.time}</div>
+                        <div class="news-content">${item.content}</div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('officialNewsContainer').innerHTML = newsHtml || `
+                    <div class="news-item">
+                        <div class="news-title">${currentLang === 'th' ? 'ไม่มีข่าวใหม่' : 'NO NEW DATA'}</div>
+                        <div class="news-content">${currentLang === 'th' ? 'ยังไม่มีข่าวใหม่จากแหล่งนี้' : 'No new data from this source yet'}</div>
+                    </div>
+                `;
+            }, 1500);
+        }
+
+        function loadInitialNews() {
+            loadOfficialNews('ocsb');
+        }
+
+        function refreshAllNews() {
+            showPageTransition(currentLang === 'th' ? 'รีเฟรชแมทริกซ์ข้อมูล...' : 'REFRESHING DATA MATRIX...', () => {
+                showLoading('officialNewsContainer');
+                
+                setTimeout(() => {
+                    const refreshedNews = [
+                        {
+                            title: currentLang === 'th' ? '🔥 ข่าวด่วน: ราคาน้ำตาลโลกพุ่งสูงสุดรอบ 3 เดือน' : '🔥 BREAKING: GLOBAL SUGAR PRICE HITS 3-MONTH HIGH',
+                            content: currentLang === 'th' ? 
+                                'ราคาน้ำตาลดิบในตลาดล่วงหน้านิวยอร์ก (ICE No.11) ปรับตัวสูงขึ้นถึง 24.8 เซนต์ต่อปอนด์ สูงสุดในรอบ 3 เดือน คาดส่งผลดีต่อราคาอ้อยไทย' :
+                                'Raw sugar price in NY futures market (ICE No.11) rose to 24.8 cents per pound, highest in 3 months, expected to benefit Thai cane prices',
+                            source: currentLang === 'th' ? 'ระบบติดตามอัตโนมัติ' : 'AUTO MONITORING SYSTEM',
+                            time: currentLang === 'th' ? 'เมื่อสักครู่' : 'JUST NOW'
+                        }
+                    ];
+                    
+                    const newsHtml = refreshedNews.map(item => `
+                        <div class="news-item">
+                            <div class="news-title">${item.title}</div>
+                            <div class="announcement-meta">${item.source} • ${item.time}</div>
+                            <div class="news-content">${item.content}</div>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('officialNewsContainer').innerHTML = newsHtml;
+                }, 2000);
+            });
+        }
+
+        // Initialize date input to today
+        document.getElementById('inputDate').value = new Date().toISOString().split('T')[0];
+
+        // Initialize calculator with current values
+        setTimeout(() => {
+            document.getElementById('calcFAO').value = dashboardData.model.faoLast;
+            document.getElementById('calcICE').value = dashboardData.model.ice30dAvg;
+            document.getElementById('calcPolicy').value = dashboardData.model.policySupport;
+            document.getElementById('calcVolatility').value = Math.abs(dashboardData.fao[0].change || 2.1);
+            calculateLivePrice();
+        }, 100);
+
+        // Initialize Matrix Effect and Tables
+        window.addEventListener('load', () => {
+            initMatrix();
+            updateFAOTable();
+            updatePolicyTable();
+            initNavTypewriter();
+            
+            // Show initial loading animation
+            showPageTransition(currentLang === 'th' ? 'เข้าสู่แมทริกซ์...' : 'ENTERING THE MATRIX...', () => {
+                // Initialize typewriter for active tab
+                const activeTab = document.querySelector('.nav-tab.active');
+                if (activeTab) {
+                    const activeTabText = activeTab.querySelector('.nav-tab-text');
+                    const currentText = activeTabText.textContent;
+                    setTimeout(() => typewriterEffect(activeTabText, currentText, 60), 500);
+                }
+            });
+        });
+
+        // Handle window resize for matrix canvas
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('matrixCanvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987f6caa87677b5a',t:'MTc1OTM1ODAzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
+
